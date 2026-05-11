@@ -1,32 +1,30 @@
 {
-    "name": ":vendor_slug/:package_slug",
-    "description": ":package_description",
+    "name": "adriaanzon/filament-passkeys",
+    "description": "Passkey MFA for Filament",
     "keywords": [
-        ":vendor_name",
+        "adriaanzon",
         "laravel",
         "filamentphp",
         "filament",
         "filament-plugin",
-        ":package_slug"
+        "filament-passkeys"
     ],
-    "homepage": "https://github.com/:vendor_slug/:package_slug",
+    "homepage": "https://github.com/adriaanzon/filament-passkeys",
     "support": {
-        "issues": "https://github.com/:vendor_slug/:package_slug/issues",
-        "source": "https://github.com/:vendor_slug/:package_slug"
+        "issues": "https://github.com/adriaanzon/filament-passkeys/issues",
+        "source": "https://github.com/adriaanzon/filament-passkeys"
     },
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": "author@domain.com",
+            "name": "Adriaan Zonnenberg",
+            "email": "git@adriaan.dev",
             "role": "Developer"
         }
     ],
     "require": {
         "php": "^8.2",
         "filament/filament": "^5.0",
-        "filament/forms": "^5.0",
-        "filament/tables": "^5.0",
         "spatie/laravel-package-tools": "^1.15.0"
     },
     "require-dev": {
@@ -38,18 +36,17 @@
         "pestphp/pest-plugin-arch": "^3.0|^4.0",
         "pestphp/pest-plugin-laravel": "^3.0|^4.0",
         "pestphp/pest-plugin-livewire": "^3.0|^4.0",
-        "rector/rector": "^2.0",
-        "spatie/laravel-ray": "^1.26"
+        "rector/rector": "^2.0"
     },
     "autoload": {
         "psr-4": {
-            "VendorName\\Skeleton\\": "src/",
-            "VendorName\\Skeleton\\Database\\Factories\\": "database/factories/"
+            "AdriaanZon\\FilamentPasskeys\\": "src/",
+            "AdriaanZon\\FilamentPasskeys\\Database\\Factories\\": "database/factories/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "VendorName\\Skeleton\\Tests\\": "tests/"
+            "AdriaanZon\\FilamentPasskeys\\Tests\\": "tests/"
         }
     },
     "scripts": {
@@ -64,10 +61,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "VendorName\\Skeleton\\SkeletonServiceProvider"
+                "AdriaanZon\\FilamentPasskeys\\FilamentPasskeysServiceProvider"
             ],
             "aliases": {
-                "Skeleton": "VendorName\\Skeleton\\Facades\\Skeleton"
+                "FilamentPasskeys": "AdriaanZon\\FilamentPasskeys\\Facades\\FilamentPasskeys"
             }
         }
     },

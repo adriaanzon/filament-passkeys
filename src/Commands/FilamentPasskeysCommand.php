@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace AdriaanZon\FilamentPasskeys\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class FilamentPasskeysCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'filament-passkeys';
 
     public $description = 'My command';
 
