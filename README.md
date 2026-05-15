@@ -5,65 +5,75 @@
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/adriaanzon/filament-passkeys/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/adriaanzon/filament-passkeys/actions?query=workflow%3A"Fix+PHP+code+styling"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/adriaanzon/filament-passkeys.svg?style=flat-square)](https://packagist.org/packages/adriaanzon/filament-passkeys)
 
-
-
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
+A Filament v5 panel plugin that adds passkey/WebAuthn as a multi-factor authentication method. Users can register one or more passkeys (fingerprint, face, device PIN, security key) from the profile page and use them as the second factor when signing in. Built on top of [`laravel/passkeys`][laravel-passkeys].
 
 ## Installation
 
-You can install the package via composer:
+1. Install the package via Composer:
+   ```bash
+   composer require adriaanzon/filament-passkeys
+   ```
+
+2. Publish and run the [`laravel/passkeys`][laravel-passkeys] migration:
+   ```bash
+   php artisan vendor:publish --tag="passkeys-migrations"
+   php artisan migrate
+   ```
+
+3. Add the `PasskeyUser` contract and `PasskeyAuthenticatable` trait to your user model:
+   ```php
+   use Filament\Models\Contracts\FilamentUser;
+   use Illuminate\Foundation\Auth\User as Authenticatable;
+   use Laravel\Passkeys\Contracts\PasskeyUser;
+   use Laravel\Passkeys\PasskeyAuthenticatable;
+
+   class User extends Authenticatable implements FilamentUser, PasskeyUser
+   {
+       use PasskeyAuthenticatable;
+
+       // ...
+   }
+   ```
+
+4. Register the plugin on your panel and add `PasskeyAuthentication` to your panel's multi-factor authentication providers:
+   ```php
+   use AdriaanZon\FilamentPasskeys\Auth\PasskeyAuthentication;
+   use AdriaanZon\FilamentPasskeys\FilamentPasskeysPlugin;
+
+   public function panel(Panel $panel): Panel
+   {
+       return $panel
+           // ...
+           ->plugin(FilamentPasskeysPlugin::make())
+           ->multiFactorAuthentication([
+               PasskeyAuthentication::make(),
+           ]);
+   }
+   ```
+
+## Configuration
+
+WebAuthn settings (relying party ID, allowed origins, user handle secret, timeout) live in [`laravel/passkeys`][laravel-passkeys]'s config. Publish it with:
 
 ```bash
-composer require adriaanzon/filament-passkeys
+php artisan vendor:publish --tag="passkeys-config"
 ```
 
-> [!IMPORTANT]
-> If you have not set up a custom theme and are using Filament Panels follow the instructions in the [Filament Docs](https://filamentphp.com/docs/4.x/styling/overview#creating-a-custom-theme) first.
-
-After setting up a custom theme add the plugin's views to your theme css file or your app's css file if using the standalone packages.
-
-```css
-@source '../../../../vendor/adriaanzon/filament-passkeys/resources/**/*.blade.php';
-```
-
-You can publish and run the migrations with:
-
-```bash
-php artisan vendor:publish --tag="filament-passkeys-migrations"
-php artisan migrate
-```
-
-You can publish the config file with:
-
-```bash
-php artisan vendor:publish --tag="filament-passkeys-config"
-```
-
-Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag="filament-passkeys-views"
-```
-
-This is the contents of the published config file:
+To customise the label rendered next to the passkey provider on the MFA challenge form, use the plugin's `loginFormLabel()` builder method:
 
 ```php
-return [
-];
+FilamentPasskeysPlugin::make()->loginFormLabel('Sign in with a passkey')
 ```
 
-## Usage
+A `Closure` is also accepted, evaluated at render time:
 
 ```php
-public function panel(Panel $panel): Panel
-{
-    return $panel
-        // ...
-        ->multiFactorAuthentication([
-            PasskeyAuthentication::make(),
-        ]);
-}
+FilamentPasskeysPlugin::make()->loginFormLabel(fn () => __('auth.passkey_label'))
 ```
+
+## Roadmap
+
+Passkey as primary authentication (passwordless sign-in) is planned for a future release. The current release covers passkey MFA only.
 
 ## Testing
 
@@ -91,3 +101,5 @@ Please review [our security policy](.github/SECURITY.md) on how to report securi
 ## License
 
 The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+
+[laravel-passkeys]: https://github.com/laravel/passkeys-server

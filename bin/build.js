@@ -50,3 +50,11 @@ compile({
 }).then(() => {
     console.log(`Build completed for filament-passkeys.js`)
 })
+
+compile({
+    ...defaultOptions,
+    entryPoints: ['./resources/css/index.css'],
+    outfile: './resources/dist/filament-passkeys.css',
+}).then(() => {
+    console.log(`Build completed for filament-passkeys.css`)
+})

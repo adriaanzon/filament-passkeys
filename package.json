@@ -8,5 +8,8 @@
     "devDependencies": {
         "esbuild": "^0.25.5",
         "prettier": "^3.5.3"
+    },
+    "dependencies": {
+        "@laravel/passkeys": "^0.1.0"
     }
 }

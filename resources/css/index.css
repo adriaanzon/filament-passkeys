@@ -1,1 +1,23 @@
-@import '../../vendor/filament/filament/resources/css/theme.css';
+.fi-passkeys-table {
+    > table {
+        margin-block: calc(var(--spacing) * 2);
+    }
+
+    > table,
+    > table > thead,
+    > table > tbody,
+    > table > tbody > tr,
+    > table > tbody > tr > td {
+        display: revert;
+    }
+
+    > table > tbody > tr > td {
+        padding-inline: calc(var(--spacing) * 3);
+        padding-block: calc(var(--spacing) * 2);
+    }
+
+    .fi-sc-actions {
+        flex-direction: row;
+    }
+}
+

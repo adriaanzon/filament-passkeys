@@ -2,11 +2,17 @@
 
 namespace AdriaanZon\FilamentPasskeys;
 
+use AdriaanZon\FilamentPasskeys\Http\Controllers\PasskeyRegistrationController;
+use AdriaanZon\FilamentPasskeys\Http\Controllers\PasskeyVerificationController;
+use Closure;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use Illuminate\Support\Facades\Route;
 
 class FilamentPasskeysPlugin implements Plugin
 {
+    protected string | Closure | null $loginFormLabel = null;
+
     public function getId(): string
     {
         return 'filament-passkeys';
@@ -14,12 +20,42 @@ class FilamentPasskeysPlugin implements Plugin
 
     public function register(Panel $panel): void
     {
-        //
+        $panel->authenticatedRoutes(function () {
+            Route::prefix('passkeys')->middleware('throttle:filament-passkeys.register')->group(function () {
+                Route::get('register/options', [PasskeyRegistrationController::class, 'index'])
+                    ->name('passkeys.register.options');
+                Route::post('register', [PasskeyRegistrationController::class, 'store'])
+                    ->name('passkeys.register');
+            });
+        });
+
+        $panel->routes(function () {
+            Route::prefix('passkeys')->middleware('throttle:filament-passkeys.verify')->group(function () {
+                Route::get('verify/options', [PasskeyVerificationController::class, 'index'])
+                    ->name('passkeys.verify.options');
+                Route::post('verify', [PasskeyVerificationController::class, 'store'])
+                    ->name('passkeys.verify');
+            });
+        });
     }
 
     public function boot(Panel $panel): void
     {
         //
+    }
+
+    public function loginFormLabel(string | Closure $label): static
+    {
+        $this->loginFormLabel = $label;
+
+        return $this;
+    }
+
+    public function getLoginFormLabel(): ?string
+    {
+        return $this->loginFormLabel instanceof Closure
+            ? ($this->loginFormLabel)()
+            : $this->loginFormLabel;
     }
 
     public static function make(): static
