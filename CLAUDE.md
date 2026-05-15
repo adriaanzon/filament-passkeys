@@ -14,3 +14,5 @@ These are easy to confuse — get them straight:
 
 - **Verify against source code.** Do not guess how Filament internals, `laravel/passkeys`, or `@laravel/passkeys` work. Read the actual source before making claims or writing code that depends on their APIs.
 - **Run `composer analyse` before claiming work is complete. PHPStan must pass.** Fix the root cause — no `@phpstan-ignore`, baseline entries, type widening, or casts just to silence it.
+- **Lean on Filament built-ins first.** Before writing custom Blade markup or Tailwind utility classes, look for an existing Filament primitive — schema components (`RepeatableEntry`, `Flex`, `Actions`, `Section`) or `<x-filament::…>` Blade components (`callout`, `link`, `loading-indicator`, `button`). Utility classes in our Blade views would force consumers to add `@source` paths to their theme; the plugin should work after just `composer require` + `php artisan filament:assets`.
+- **`resources/dist/` is build output.** Source lives in `resources/css/` and `resources/js/`; run `npm run build` to compile. Never hand-edit files in `resources/dist/`.
