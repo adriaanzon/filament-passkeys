@@ -1,10 +1,5 @@
 # Passkey MFA for Filament
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/adriaanzon/filament-passkeys.svg?style=flat-square)](https://packagist.org/packages/adriaanzon/filament-passkeys)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/adriaanzon/filament-passkeys/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/adriaanzon/filament-passkeys/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/adriaanzon/filament-passkeys/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/adriaanzon/filament-passkeys/actions?query=workflow%3A"Fix+PHP+code+styling"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/adriaanzon/filament-passkeys.svg?style=flat-square)](https://packagist.org/packages/adriaanzon/filament-passkeys)
-
 A Filament v5 panel plugin that adds passkey/WebAuthn as a multi-factor authentication method. Users can register one or more passkeys (fingerprint, face, device PIN, security key) from the profile page and use them as the second factor when signing in. Built on top of [`laravel/passkeys`][laravel-passkeys].
 
 ## Installation
