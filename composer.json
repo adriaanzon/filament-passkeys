@@ -1,13 +1,15 @@
 {
     "name": "adriaanzon/filament-passkeys",
-    "description": "Passkey MFA for Filament",
+    "description": "Filament Passkey MFA using laravel/passkeys",
     "keywords": [
         "adriaanzon",
         "laravel",
         "filamentphp",
         "filament",
         "filament-plugin",
-        "filament-passkeys"
+        "filament-passkeys",
+        "webauthn",
+        "fortify"
     ],
     "homepage": "https://github.com/adriaanzon/filament-passkeys",
     "support": {
@@ -40,8 +42,7 @@
     },
     "autoload": {
         "psr-4": {
-            "AdriaanZon\\FilamentPasskeys\\": "src/",
-            "AdriaanZon\\FilamentPasskeys\\Database\\Factories\\": "database/factories/"
+            "AdriaanZon\\FilamentPasskeys\\": "src/"
         }
     },
     "autoload-dev": {
