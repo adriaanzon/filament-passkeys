@@ -32,7 +32,7 @@ A Filament v5 panel plugin that adds passkey/WebAuthn as a multi-factor authenti
 
 4. Register the plugin on your panel and add `PasskeyAuthentication` to your panel's multi-factor authentication providers:
    ```php
-   use AdriaanZon\FilamentPasskeys\Auth\PasskeyAuthentication;
+   use AdriaanZon\FilamentPasskeys\PasskeyAuthentication;
    use AdriaanZon\FilamentPasskeys\FilamentPasskeysPlugin;
 
    public function panel(Panel $panel): Panel

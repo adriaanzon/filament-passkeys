@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namespace AdriaanZon\FilamentPasskeys\Auth;
+namespace AdriaanZon\FilamentPasskeys;
 
-use AdriaanZon\FilamentPasskeys\Auth\Actions\DeletePasskeyAction;
-use AdriaanZon\FilamentPasskeys\Auth\Actions\RenamePasskeyAction;
-use AdriaanZon\FilamentPasskeys\FilamentPasskeysPlugin;
+use AdriaanZon\FilamentPasskeys\Actions\DeletePasskeyAction;
+use AdriaanZon\FilamentPasskeys\Actions\RenamePasskeyAction;
 use AdriaanZon\FilamentPasskeys\Forms\Components\PasskeyChallenge;
 use Closure;
 use Filament\Auth\MultiFactor\Contracts\MultiFactorAuthenticationProvider;

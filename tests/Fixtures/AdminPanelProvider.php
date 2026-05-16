@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace AdriaanZon\FilamentPasskeys\Tests\Fixtures;
 
-use AdriaanZon\FilamentPasskeys\Auth\PasskeyAuthentication;
 use AdriaanZon\FilamentPasskeys\FilamentPasskeysPlugin;
+use AdriaanZon\FilamentPasskeys\PasskeyAuthentication;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;

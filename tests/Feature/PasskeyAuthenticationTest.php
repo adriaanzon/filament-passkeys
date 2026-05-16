@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use AdriaanZon\FilamentPasskeys\Auth\PasskeyAuthentication;
+use AdriaanZon\FilamentPasskeys\PasskeyAuthentication;
 use AdriaanZon\FilamentPasskeys\Tests\Fixtures\User;
 
 it('returns passkey as the provider id', function () {

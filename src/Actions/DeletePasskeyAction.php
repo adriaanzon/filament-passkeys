@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AdriaanZon\FilamentPasskeys\Auth\Actions;
+namespace AdriaanZon\FilamentPasskeys\Actions;
 
 use Filament\Actions\Action;
 use Filament\Facades\Filament;
