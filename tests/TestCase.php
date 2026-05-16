@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AdriaanZon\FilamentPasskeys\Tests;
 
 use AdriaanZon\FilamentPasskeys\FilamentPasskeysServiceProvider;

@@ -3,11 +3,12 @@
     "type": "module",
     "scripts": {
         "dev": "node bin/build.js --dev",
-        "build": "node bin/build.js"
+        "build": "node bin/build.js",
+        "postinstall": "lefthook install"
     },
     "devDependencies": {
         "esbuild": "^0.28.0",
-        "prettier": "^3.5.3"
+        "lefthook": "^2.1.5"
     },
     "dependencies": {
         "@laravel/passkeys": "^0.2.0"

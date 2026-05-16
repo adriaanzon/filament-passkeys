@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AdriaanZon\FilamentPasskeys;
 
 use AdriaanZon\FilamentPasskeys\Http\Controllers\PasskeyRegistrationController;
@@ -20,8 +22,8 @@ class FilamentPasskeysPlugin implements Plugin
 
     public function register(Panel $panel): void
     {
-        $panel->authenticatedRoutes(function () {
-            Route::prefix('passkeys')->middleware('throttle:filament-passkeys.register')->group(function () {
+        $panel->authenticatedRoutes(function (): void {
+            Route::prefix('passkeys')->middleware('throttle:filament-passkeys.register')->group(function (): void {
                 Route::get('register/options', [PasskeyRegistrationController::class, 'index'])
                     ->name('passkeys.register.options');
                 Route::post('register', [PasskeyRegistrationController::class, 'store'])
@@ -29,8 +31,8 @@ class FilamentPasskeysPlugin implements Plugin
             });
         });
 
-        $panel->routes(function () {
-            Route::prefix('passkeys')->middleware('throttle:filament-passkeys.verify')->group(function () {
+        $panel->routes(function (): void {
+            Route::prefix('passkeys')->middleware('throttle:filament-passkeys.verify')->group(function (): void {
                 Route::get('verify/options', [PasskeyVerificationController::class, 'index'])
                     ->name('passkeys.verify.options');
                 Route::post('verify', [PasskeyVerificationController::class, 'store'])

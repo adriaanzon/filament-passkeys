@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use AdriaanZon\FilamentPasskeys\Tests\Fixtures\User;
 
 beforeEach(function () {

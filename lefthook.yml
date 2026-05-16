@@ -1,0 +1,20 @@
+pre-commit:
+  commands:
+    pint:
+      glob: '*.php'
+      run: vendor/bin/pint --dirty --parallel
+      stage_fixed: true
+
+pre-push:
+  parallel: true
+  commands:
+    phpstan:
+      run: vendor/bin/phpstan
+    pint:
+      run: vendor/bin/pint --test --parallel
+      fail_text: 'To fix, run `vendor/bin/pint`'
+    rector:
+      run: vendor/bin/rector --dry-run
+      fail_text: 'To fix, run `vendor/bin/rector`'
+    pest:
+      run: vendor/bin/pest

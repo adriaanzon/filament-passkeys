@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AdriaanZon\FilamentPasskeys;
 
 use Filament\Support\Assets\Css;
@@ -43,7 +45,8 @@ class FilamentPasskeysServiceProvider extends PackageServiceProvider
         });
 
         RateLimiter::for('filament-passkeys.register', function (Request $request): Limit {
-            $key = $request->user()?->getAuthIdentifier() ?? $request->ip();
+            $id = $request->user()?->getAuthIdentifier();
+            $key = is_string($id) || is_int($id) ? $id : $request->ip();
 
             return Limit::perMinute(5)->by('filament-passkeys.register:' . $key);
         });

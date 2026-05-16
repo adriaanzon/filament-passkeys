@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AdriaanZon\FilamentPasskeys\Http\Controllers;
 
 use Filament\Facades\Filament;
@@ -8,14 +10,18 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Laravel\Passkeys\Actions\GenerateRegistrationOptions;
 use Laravel\Passkeys\Actions\StorePasskey;
+use Laravel\Passkeys\Contracts\PasskeyUser;
 use Laravel\Passkeys\Http\Requests\PasskeyRegistrationRequest;
 use Laravel\Passkeys\Support\WebAuthn;
+use LogicException;
 
 class PasskeyRegistrationController extends Controller
 {
     public function index(Request $request, GenerateRegistrationOptions $generate): JsonResponse
     {
         $user = Filament::auth()->user();
+
+        throw_unless($user instanceof PasskeyUser, new LogicException('The authenticated user must implement the [' . PasskeyUser::class . '] interface.'));
 
         $options = $generate($user);
 
@@ -33,6 +39,8 @@ class PasskeyRegistrationController extends Controller
         StorePasskey $storePasskey,
     ): JsonResponse {
         $user = Filament::auth()->user();
+
+        throw_unless($user instanceof PasskeyUser, new LogicException('The authenticated user must implement the [' . PasskeyUser::class . '] interface.'));
 
         $passkey = $storePasskey(
             $user,

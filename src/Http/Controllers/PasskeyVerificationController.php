@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AdriaanZon\FilamentPasskeys\Http\Controllers;
 
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -48,8 +50,11 @@ class PasskeyVerificationController extends Controller
             $user
         );
 
+        $id = $user->getAuthIdentifier();
+        assert(is_string($id) || is_int($id));
+
         $request->session()->put(
-            'filament-passkeys.mfa-verified.' . $user->getAuthIdentifier(),
+            'filament-passkeys.mfa-verified.' . $id,
             true
         );
 
@@ -72,6 +77,10 @@ class PasskeyVerificationController extends Controller
             return null;
         }
 
+        if (! is_string($userId) && ! is_int($userId)) {
+            return null;
+        }
+
         /** @var class-string<Authenticatable> $userModel */
         $userModel = Passkeys::userModel();
 
@@ -89,6 +98,10 @@ class PasskeyVerificationController extends Controller
         try {
             $userId = decrypt($encrypted);
         } catch (Throwable) {
+            return null;
+        }
+
+        if (! is_string($userId) && ! is_int($userId)) {
             return null;
         }
 

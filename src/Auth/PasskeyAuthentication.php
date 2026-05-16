@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AdriaanZon\FilamentPasskeys\Auth;
 
 use AdriaanZon\FilamentPasskeys\Auth\Actions\DeletePasskeyAction;
@@ -106,14 +108,13 @@ class PasskeyAuthentication implements MultiFactorAuthenticationProvider
             PasskeyChallenge::make('credential')
                 ->hiddenLabel()
                 ->required()
-                ->rule(function () use ($user): Closure {
-                    return function (string $attribute, $value, Closure $fail) use ($user): void {
-                        $key = 'filament-passkeys.mfa-verified.' . $user->getAuthIdentifier();
+                ->rule(fn (): Closure => function (string $attribute, $value, Closure $fail) use ($user): void {
+                    $id = $user->getAuthIdentifier();
+                    assert(is_string($id) || is_int($id));
 
-                        if (session()->pull($key) !== true) {
-                            $fail(__('filament-passkeys::passkeys.challenge.failed'));
-                        }
-                    };
+                    if (session()->pull('filament-passkeys.mfa-verified.' . $id) !== true) {
+                        $fail(__('filament-passkeys::passkeys.challenge.failed'));
+                    }
                 }),
         ];
     }
