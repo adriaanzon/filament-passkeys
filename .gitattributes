@@ -26,4 +26,5 @@
 /resources/css          export-ignore
 /resources/js           export-ignore
 /stubs                  export-ignore
+/testbench.yaml         export-ignore
 /tests                  export-ignore
