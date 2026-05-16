@@ -16,22 +16,21 @@
             init() {
                 this.supported = window.FilamentPasskeys?.isSupported() ?? false
                 this.encryptedUser = $wire.userUndertakingMultiFactorAuthentication ?? ''
+                this.form = this.$el.closest('form')
 
-                const form = this.$el.closest('form')
-
-                if (form) {
+                if (this.form) {
                     this.submitHandler = (event) => this.handleSubmit(event)
-                    form.addEventListener('submit', this.submitHandler, { capture: true })
+                    this.form.addEventListener('submit', this.submitHandler, { capture: true })
                 }
 
-                if (this.supported) {
-                    this.autofill()
+                if (this.supported && this.form) {
+                    this.tryVerify(this.form)
                 }
             },
 
             destroy() {
-                if (this.submitHandler) {
-                    this.$el.closest('form')?.removeEventListener('submit', this.submitHandler, { capture: true })
+                if (this.submitHandler && this.form) {
+                    this.form.removeEventListener('submit', this.submitHandler, { capture: true })
                 }
 
                 if (this.supported) {
@@ -46,41 +45,29 @@
                 }
             },
 
-            async markVerifiedAndSubmit(form) {
+            markVerifiedAndSubmit(form) {
                 this.verified = true
-                await $wire.set(@js($statePath), 'verified')
+                this.$refs.credential.value = 'verified'
+                this.$refs.credential.dispatchEvent(new Event('input'))
                 this.$nextTick(() => form.requestSubmit())
             },
 
-            async autofill() {
-                try {
-                    const result = await window.FilamentPasskeys.autofill({
-                        routes: this.routes(),
-                    })
-
-                    if (result) {
-                        this.markVerifiedAndSubmit(this.$el.closest('form'))
-                    }
-                } catch {
-                    // No matching passkey, or autofill unsupported.
-                }
-            },
-
-            async handleSubmit(event) {
-                if (this.verified) return
-
-                event.preventDefault()
-                event.stopImmediatePropagation()
+            async tryVerify(form) {
+                if (this.loading || this.verified) return
 
                 this.loading = true
 
                 try {
                     await window.FilamentPasskeys.verify({ routes: this.routes() })
-                    this.markVerifiedAndSubmit(event.target)
+                    this.markVerifiedAndSubmit(form)
                 } catch (e) {
-                    if (e.name === 'UserCancelledError' || e.constructor?.name === 'UserCancelledError') {
-                        return
-                    }
+                    const cancelled = e.name === 'UserCancelledError'
+                        || e.constructor?.name === 'UserCancelledError'
+                        || e.message?.includes('abort')
+
+                    if (cancelled) return
+
+                    console.error('[filament-passkeys] verify failed', e)
 
                     new window.FilamentNotification()
                         .title(@js(__('filament-passkeys::passkeys.challenge.failed')))
@@ -89,6 +76,15 @@
                 } finally {
                     this.loading = false
                 }
+            },
+
+            handleSubmit(event) {
+                if (this.verified) return
+
+                event.preventDefault()
+                event.stopImmediatePropagation()
+
+                this.tryVerify(event.target)
             },
         }"
     >
@@ -100,15 +96,10 @@
             />
         </template>
 
+        <input type="hidden" x-ref="credential" wire:model="{{ $statePath }}" />
+
         <template x-if="supported">
             <div>
-                <input
-                    autocomplete="webauthn"
-                    tabindex="-1"
-                    aria-hidden="true"
-                    style="position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none;"
-                />
-
                 <x-filament::callout
                     color="info"
                     icon="heroicon-m-finger-print"
