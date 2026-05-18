@@ -6,8 +6,6 @@
 
 <div
     class="fi-passkeys-login-button"
-    data-options-url="{{ $optionsUrl }}"
-    data-submit-url="{{ $submitUrl }}"
     x-data="{
         supported: true,
         loading: false,
@@ -35,8 +33,8 @@
 
         routes() {
             return {
-                options: this.$el.dataset.optionsUrl,
-                submit: this.$el.dataset.submitUrl,
+                options: @js($optionsUrl),
+                submit: @js($submitUrl),
             }
         },
 
