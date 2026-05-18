@@ -1,7 +1,7 @@
 @php
     $panelId = filament()->getId();
-    $optionsUrl = route("filament.{$panelId}.passkeys.verify.options");
-    $submitUrl = route("filament.{$panelId}.passkeys.verify");
+    $optionsUrl = route("filament.{$panelId}.passkey.confirm-options");
+    $submitUrl = route("filament.{$panelId}.passkey.confirm");
     $statePath = $getStatePath();
 @endphp
 

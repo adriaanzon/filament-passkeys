@@ -16,7 +16,7 @@ use Laravel\Passkeys\Passkeys;
 use Laravel\Passkeys\Support\WebAuthn;
 use Throwable;
 
-class PasskeyVerificationController extends Controller
+class PasskeyConfirmationController extends Controller
 {
     public function index(Request $request, GenerateVerificationOptions $generate): JsonResponse
     {

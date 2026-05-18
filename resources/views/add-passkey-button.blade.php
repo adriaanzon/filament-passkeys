@@ -1,7 +1,7 @@
 @php
     $panelId = filament()->getId();
-    $optionsUrl = route("filament.{$panelId}.passkeys.register.options");
-    $submitUrl = route("filament.{$panelId}.passkeys.register");
+    $optionsUrl = route("filament.{$panelId}.passkey.registration-options");
+    $submitUrl = route("filament.{$panelId}.passkey.store");
 @endphp
 
 <div

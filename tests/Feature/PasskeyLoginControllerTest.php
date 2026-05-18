@@ -96,5 +96,5 @@ it('renders the sign in with passkey button on the login page', function () {
 
     $response->assertOk();
     $response->assertSee('fi-passkeys-login-button', false);
-    $response->assertSee(route('filament.admin.passkeys.login.options'), false);
+    $response->assertSee('\/admin\/passkeys\/login\/options', false);
 });
