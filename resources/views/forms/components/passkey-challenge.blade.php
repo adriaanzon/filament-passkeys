@@ -91,7 +91,7 @@
         <template x-if="!supported">
             <x-filament::callout
                 color="danger"
-                icon="heroicon-m-exclamation-triangle"
+                icon="heroicon-s-exclamation-triangle"
                 :heading="__('filament-passkeys::passkeys.challenge.unsupported')"
             />
         </template>
@@ -102,7 +102,7 @@
             <div>
                 <x-filament::callout
                     color="info"
-                    icon="heroicon-m-finger-print"
+                    icon="filamentpasskeys-s-user-key"
                     :heading="__('filament-passkeys::passkeys.challenge.callout.heading')"
                 >
                     <x-slot:description>

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AdriaanZon\FilamentPasskeys;
 
+use BladeUI\Icons\Factory as BladeIconsFactory;
 use Filament\Support\Assets\Css;
 use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
@@ -24,6 +25,16 @@ class FilamentPasskeysServiceProvider extends PackageServiceProvider
         $package->name(static::$name)
             ->hasViews(static::$viewNamespace)
             ->hasTranslations();
+    }
+
+    public function packageRegistered(): void
+    {
+        $this->callAfterResolving(BladeIconsFactory::class, function (BladeIconsFactory $factory): void {
+            $factory->add('filament-passkeys', [
+                'path' => __DIR__ . '/../resources/icons',
+                'prefix' => 'filamentpasskeys',
+            ]);
+        });
     }
 
     public function packageBooted(): void

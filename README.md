@@ -38,6 +38,8 @@ A Filament v5 panel plugin that adds passkey/WebAuthn as a multi-factor authenti
    public function panel(Panel $panel): Panel
    {
        return $panel
+           ->login()
+           ->profile()
            // ...
            ->plugin(FilamentPasskeysPlugin::make())
            ->multiFactorAuthentication([

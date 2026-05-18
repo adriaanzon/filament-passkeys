@@ -51,7 +51,7 @@
     <template x-if="!supported">
         <x-filament::callout
             color="danger"
-            icon="heroicon-m-exclamation-triangle"
+            icon="heroicon-s-exclamation-triangle"
             :heading="__('filament-passkeys::passkeys.challenge.unsupported')"
         />
     </template>
