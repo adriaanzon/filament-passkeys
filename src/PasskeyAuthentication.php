@@ -49,13 +49,7 @@ class PasskeyAuthentication implements MultiFactorAuthenticationProvider
 
     public function getLoginFormLabel(): string
     {
-        try {
-            $label = FilamentPasskeysPlugin::get()->getLoginFormLabel();
-        } catch (\Throwable) {
-            $label = null;
-        }
-
-        return $label ?? __('filament-passkeys::passkeys.provider.label');
+        return __('filament-passkeys::passkeys.provider.label');
     }
 
     public function isEnabled(Authenticatable $user): bool

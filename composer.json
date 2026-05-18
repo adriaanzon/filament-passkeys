@@ -1,6 +1,6 @@
 {
     "name": "adriaanzon/filament-passkeys",
-    "description": "Filament Passkey MFA using laravel/passkeys",
+    "description": "Passkeys for Filament using laravel/passkeys",
     "keywords": [
         "adriaanzon",
         "laravel",

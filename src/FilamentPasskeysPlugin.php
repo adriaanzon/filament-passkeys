@@ -7,15 +7,12 @@ namespace AdriaanZon\FilamentPasskeys;
 use AdriaanZon\FilamentPasskeys\Http\Controllers\PasskeyLoginController;
 use AdriaanZon\FilamentPasskeys\Http\Controllers\PasskeyRegistrationController;
 use AdriaanZon\FilamentPasskeys\Http\Controllers\PasskeyVerificationController;
-use Closure;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 use Illuminate\Support\Facades\Route;
 
 class FilamentPasskeysPlugin implements Plugin
 {
-    protected string | Closure | null $loginFormLabel = null;
-
     protected bool $passwordlessLogin = false;
 
     public function getId(): string
@@ -25,8 +22,10 @@ class FilamentPasskeysPlugin implements Plugin
 
     public function register(Panel $panel): void
     {
-        $panel->authenticatedRoutes(function (): void {
-            Route::prefix('passkeys')->middleware('throttle:filament-passkeys.register')->group(function (): void {
+        $throttle = (array) config('passkeys.throttle');
+
+        $panel->authenticatedRoutes(function () use ($throttle): void {
+            Route::prefix('passkeys')->middleware($throttle)->group(function (): void {
                 Route::get('register/options', [PasskeyRegistrationController::class, 'index'])
                     ->name('passkeys.register.options');
                 Route::post('register', [PasskeyRegistrationController::class, 'store'])
@@ -34,8 +33,8 @@ class FilamentPasskeysPlugin implements Plugin
             });
         });
 
-        $panel->routes(function (): void {
-            Route::prefix('passkeys')->middleware('throttle:filament-passkeys.verify')->group(function (): void {
+        $panel->routes(function () use ($throttle): void {
+            Route::prefix('passkeys')->middleware($throttle)->group(function (): void {
                 Route::get('verify/options', [PasskeyVerificationController::class, 'index'])
                     ->name('passkeys.verify.options');
                 Route::post('verify', [PasskeyVerificationController::class, 'store'])
@@ -44,9 +43,9 @@ class FilamentPasskeysPlugin implements Plugin
         });
 
         if ($this->passwordlessLogin) {
-            $panel->routes(function (): void {
+            $panel->routes(function () use ($throttle): void {
                 Route::prefix('passkeys')
-                    ->middleware((array) config('passkeys.throttle'))
+                    ->middleware($throttle)
                     ->group(function (): void {
                         Route::get('login/options', [PasskeyLoginController::class, 'index'])
                             ->name('passkeys.login.options');
@@ -72,20 +71,6 @@ class FilamentPasskeysPlugin implements Plugin
     public function hasPasswordlessLogin(): bool
     {
         return $this->passwordlessLogin;
-    }
-
-    public function loginFormLabel(string | Closure $label): static
-    {
-        $this->loginFormLabel = $label;
-
-        return $this;
-    }
-
-    public function getLoginFormLabel(): ?string
-    {
-        return $this->loginFormLabel instanceof Closure
-            ? ($this->loginFormLabel)()
-            : $this->loginFormLabel;
     }
 
     public static function make(): static

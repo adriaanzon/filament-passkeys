@@ -11,9 +11,6 @@ use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
-use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\RateLimiter;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -46,24 +43,6 @@ class FilamentPasskeysServiceProvider extends PackageServiceProvider
             Js::make('filament-passkeys', __DIR__ . '/../resources/dist/filament-passkeys.js'),
             Css::make('filament-passkeys', __DIR__ . '/../resources/dist/filament-passkeys.css'),
         ], package: 'adriaanzon/filament-passkeys');
-
-        RateLimiter::for('filament-passkeys.verify', function (Request $request): Limit {
-            $encryptedUser = $request->query('user')
-                ?? $request->session()->get('passkey.mfa_user');
-
-            $key = is_string($encryptedUser) && filled($encryptedUser)
-                ? sha1($encryptedUser)
-                : $request->ip();
-
-            return Limit::perMinute(5)->by('filament-passkeys.verify:' . $key);
-        });
-
-        RateLimiter::for('filament-passkeys.register', function (Request $request): Limit {
-            $id = $request->user()?->getAuthIdentifier();
-            $key = is_string($id) || is_int($id) ? $id : $request->ip();
-
-            return Limit::perMinute(5)->by('filament-passkeys.register:' . $key);
-        });
 
         FilamentView::registerRenderHook(
             PanelsRenderHook::AUTH_LOGIN_FORM_AFTER,
