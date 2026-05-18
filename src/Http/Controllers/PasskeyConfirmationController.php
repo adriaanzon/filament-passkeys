@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AdriaanZon\FilamentPasskeys\Http\Controllers;
 
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -14,7 +15,6 @@ use Laravel\Passkeys\Contracts\PasskeyUser;
 use Laravel\Passkeys\Http\Requests\PasskeyVerificationRequest;
 use Laravel\Passkeys\Passkeys;
 use Laravel\Passkeys\Support\WebAuthn;
-use Throwable;
 
 class PasskeyConfirmationController extends Controller
 {
@@ -65,39 +65,23 @@ class PasskeyConfirmationController extends Controller
 
     protected function resolveUser(Request $request): ?Authenticatable
     {
-        $encrypted = $request->query('user');
-
-        if (! is_string($encrypted) || blank($encrypted)) {
-            return null;
-        }
-
-        try {
-            $userId = decrypt($encrypted);
-        } catch (Throwable) {
-            return null;
-        }
-
-        if (! is_string($userId) && ! is_int($userId)) {
-            return null;
-        }
-
-        /** @var class-string<Authenticatable> $userModel */
-        $userModel = Passkeys::userModel();
-
-        return $userModel::find($userId);
+        return $this->findUserByEncryptedId($request->query('user'));
     }
 
     protected function resolveUserFromSession(Request $request): ?Authenticatable
     {
-        $encrypted = $request->session()->get('passkey.mfa_user');
+        return $this->findUserByEncryptedId($request->session()->get('passkey.mfa_user'));
+    }
 
+    protected function findUserByEncryptedId(mixed $encrypted): ?Authenticatable
+    {
         if (! is_string($encrypted) || blank($encrypted)) {
             return null;
         }
 
         try {
             $userId = decrypt($encrypted);
-        } catch (Throwable) {
+        } catch (DecryptException) {
             return null;
         }
 
