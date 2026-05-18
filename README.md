@@ -68,9 +68,32 @@ A `Closure` is also accepted, evaluated at render time:
 FilamentPasskeysPlugin::make()->loginFormLabel(fn () => __('auth.passkey_label'))
 ```
 
-## Roadmap
+## Passwordless sign-in
 
-Passkey as primary authentication (passwordless sign-in) is planned for a future release. The current release covers passkey MFA only.
+Out of the box this plugin uses passkeys as a second factor. To also allow signing in with a passkey on the login page (button + autofill), enable passwordless login on the plugin:
+
+```php
+FilamentPasskeysPlugin::make()->passwordlessLogin()
+```
+
+Once enabled, two extra routes are registered on the panel:
+
+- `GET  {panel}/passkeys/login/options`
+- `POST {panel}/passkeys/login`
+
+Throttling is taken from `config('passkeys.throttle')` (defaults to `throttle:6,1`). A successful passwordless passkey sign-in fully authenticates the user; Filament's MFA challenge flow is not invoked, since WebAuthn user-verification already constitutes two factors (possession + biometric/PIN).
+
+## Management-only mode
+
+If you want users to be able to register and manage passkeys from their profile but you don't want passkeys to act as a second factor (e.g. you've enabled passwordless login but use a different MFA factor for the password path), mark the provider as management-only:
+
+```php
+->multiFactorAuthentication([
+    PasskeyAuthentication::make()->managementOnly(),
+])
+```
+
+This makes the provider's `isEnabled()` always return `false` (so Filament never challenges with passkeys) and hides the enabled/disabled badge. The passkey management table, plus add/rename/delete actions, all keep working.
 
 ## Testing
 

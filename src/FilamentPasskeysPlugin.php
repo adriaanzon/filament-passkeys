@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AdriaanZon\FilamentPasskeys;
 
+use AdriaanZon\FilamentPasskeys\Http\Controllers\PasskeyLoginController;
 use AdriaanZon\FilamentPasskeys\Http\Controllers\PasskeyRegistrationController;
 use AdriaanZon\FilamentPasskeys\Http\Controllers\PasskeyVerificationController;
 use Closure;
@@ -14,6 +15,8 @@ use Illuminate\Support\Facades\Route;
 class FilamentPasskeysPlugin implements Plugin
 {
     protected string | Closure | null $loginFormLabel = null;
+
+    protected bool $passwordlessLogin = false;
 
     public function getId(): string
     {
@@ -39,11 +42,36 @@ class FilamentPasskeysPlugin implements Plugin
                     ->name('passkeys.verify');
             });
         });
+
+        if ($this->passwordlessLogin) {
+            $panel->routes(function (): void {
+                Route::prefix('passkeys')
+                    ->middleware((array) config('passkeys.throttle'))
+                    ->group(function (): void {
+                        Route::get('login/options', [PasskeyLoginController::class, 'index'])
+                            ->name('passkeys.login.options');
+                        Route::post('login', [PasskeyLoginController::class, 'store'])
+                            ->name('passkeys.login');
+                    });
+            });
+        }
     }
 
     public function boot(Panel $panel): void
     {
         //
+    }
+
+    public function passwordlessLogin(bool $enabled = true): static
+    {
+        $this->passwordlessLogin = $enabled;
+
+        return $this;
+    }
+
+    public function hasPasswordlessLogin(): bool
+    {
+        return $this->passwordlessLogin;
     }
 
     public function loginFormLabel(string | Closure $label): static

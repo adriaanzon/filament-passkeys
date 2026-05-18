@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace AdriaanZon\FilamentPasskeys;
 
 use BladeUI\Icons\Factory as BladeIconsFactory;
+use Filament\Facades\Filament;
 use Filament\Support\Assets\Css;
 use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
+use Filament\Support\Facades\FilamentView;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -61,5 +64,25 @@ class FilamentPasskeysServiceProvider extends PackageServiceProvider
 
             return Limit::perMinute(5)->by('filament-passkeys.register:' . $key);
         });
+
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::AUTH_LOGIN_FORM_AFTER,
+            static function (): ?string {
+                $panel = Filament::getCurrentPanel();
+
+                if ($panel === null || ! $panel->hasPlugin('filament-passkeys')) {
+                    return null;
+                }
+
+                /** @var FilamentPasskeysPlugin $plugin */
+                $plugin = $panel->getPlugin('filament-passkeys');
+
+                if (! $plugin->hasPasswordlessLogin()) {
+                    return null;
+                }
+
+                return view('filament-passkeys::login-button')->render();
+            },
+        );
     }
 }

@@ -30,3 +30,13 @@ it('registers passkey routes on the panel', function () {
     expect($routes)->toContain('filament.admin.passkeys.verify.options');
     expect($routes)->toContain('filament.admin.passkeys.verify');
 });
+
+it('reports passwordless login disabled by default', function () {
+    expect(FilamentPasskeysPlugin::make()->hasPasswordlessLogin())->toBeFalse();
+});
+
+it('enables passwordless login via the builder', function () {
+    $plugin = FilamentPasskeysPlugin::make()->passwordlessLogin();
+
+    expect($plugin->hasPasswordlessLogin())->toBeTrue();
+});

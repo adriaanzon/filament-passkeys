@@ -20,7 +20,8 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->plugin(FilamentPasskeysPlugin::make())
+            ->login()
+            ->plugin(FilamentPasskeysPlugin::make()->passwordlessLogin())
             ->multiFactorAuthentication([
                 PasskeyAuthentication::make(),
             ])
