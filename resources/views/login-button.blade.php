@@ -90,7 +90,6 @@
             icon="filamentpasskeys-m-user-key"
             x-on:click="verify()"
             x-bind:disabled="loading"
-            class="w-full"
         >
             {{ __('filament-passkeys::passkeys.login.button') }}
         </x-filament::button>
