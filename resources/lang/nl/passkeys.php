@@ -43,4 +43,9 @@ return [
     'register' => [
         'name_label' => 'Naam van passkey',
     ],
+
+    'login' => [
+        'button' => 'Inloggen met passkey',
+        'failed' => 'We konden je passkey niet verifiëren. Probeer het opnieuw.',
+    ],
 ];

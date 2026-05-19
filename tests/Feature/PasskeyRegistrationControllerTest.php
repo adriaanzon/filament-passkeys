@@ -15,7 +15,7 @@ beforeEach(function () {
 });
 
 it('returns registration options', function () {
-    $response = $this->getJson('/admin/passkeys/register/options');
+    $response = $this->getJson('/admin/user/passkeys/options');
 
     $response->assertOk();
     $response->assertJsonStructure(['options']);
@@ -24,6 +24,6 @@ it('returns registration options', function () {
 it('rejects unauthenticated requests for registration options', function () {
     auth()->logout();
 
-    $this->getJson('/admin/passkeys/register/options')
+    $this->getJson('/admin/user/passkeys/options')
         ->assertUnauthorized();
 });

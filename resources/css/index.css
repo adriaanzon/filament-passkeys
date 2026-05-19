@@ -1,3 +1,7 @@
+.fi-passkeys-login-button .fi-btn {
+    width: 100%;
+}
+
 .fi-passkeys-table {
     > table {
         margin-block: calc(var(--spacing) * 2);

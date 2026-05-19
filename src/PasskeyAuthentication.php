@@ -23,9 +23,23 @@ use LogicException;
 
 class PasskeyAuthentication implements MultiFactorAuthenticationProvider
 {
+    protected bool $managementOnly = false;
+
     public static function make(): static
     {
         return app(static::class);
+    }
+
+    public function managementOnly(bool $enabled = true): static
+    {
+        $this->managementOnly = $enabled;
+
+        return $this;
+    }
+
+    public function isManagementOnly(): bool
+    {
+        return $this->managementOnly;
     }
 
     public function getId(): string
@@ -35,19 +49,17 @@ class PasskeyAuthentication implements MultiFactorAuthenticationProvider
 
     public function getLoginFormLabel(): string
     {
-        try {
-            $label = FilamentPasskeysPlugin::get()->getLoginFormLabel();
-        } catch (\Throwable) {
-            $label = null;
-        }
-
-        return $label ?? __('filament-passkeys::passkeys.provider.label');
+        return __('filament-passkeys::passkeys.provider.label');
     }
 
     public function isEnabled(Authenticatable $user): bool
     {
         if (! $user instanceof PasskeyUser) {
             throw new LogicException('The user model must implement the [' . PasskeyUser::class . '] interface to use passkey authentication.');
+        }
+
+        if ($this->managementOnly) {
+            return false;
         }
 
         return $user->passkeys()->exists();
@@ -67,15 +79,14 @@ class PasskeyAuthentication implements MultiFactorAuthenticationProvider
             RepeatableEntry::make('passkeys')
                 ->extraAttributes(['class' => 'fi-passkeys-table'])
                 ->label(__('filament-passkeys::passkeys.management.heading'))
-                ->afterLabel(function () use ($getPasskeys): Text {
-                    $isEnabled = $getPasskeys()->isNotEmpty();
-
-                    return Text::make($isEnabled
-                        ? __('filament-passkeys::passkeys.management.enabled')
-                        : __('filament-passkeys::passkeys.management.disabled'))
-                        ->badge()
-                        ->color($isEnabled ? 'success' : 'gray');
-                })
+                ->when(
+                    ! $this->managementOnly,
+                    fn (RepeatableEntry $entry): RepeatableEntry => $entry->afterLabel(
+                        fn (): Text => $getPasskeys()->isNotEmpty()
+                            ? Text::make(__('filament-passkeys::passkeys.management.enabled'))->badge()->color('success')
+                            : Text::make(__('filament-passkeys::passkeys.management.disabled'))->badge()->color('gray')
+                    )
+                )
                 ->aboveContent(__('filament-passkeys::passkeys.management.description'))
                 ->belowContent(View::make('filament-passkeys::add-passkey-button'))
                 ->constantState($getPasskeys)

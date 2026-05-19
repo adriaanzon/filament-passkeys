@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace AdriaanZon\FilamentPasskeys;
 
 use BladeUI\Icons\Factory as BladeIconsFactory;
+use Filament\Facades\Filament;
 use Filament\Support\Assets\Css;
 use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
-use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\RateLimiter;
+use Filament\Support\Facades\FilamentView;
+use Filament\View\PanelsRenderHook;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -44,22 +44,24 @@ class FilamentPasskeysServiceProvider extends PackageServiceProvider
             Css::make('filament-passkeys', __DIR__ . '/../resources/dist/filament-passkeys.css'),
         ], package: 'adriaanzon/filament-passkeys');
 
-        RateLimiter::for('filament-passkeys.verify', function (Request $request): Limit {
-            $encryptedUser = $request->query('user')
-                ?? $request->session()->get('passkey.mfa_user');
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::AUTH_LOGIN_FORM_AFTER,
+            static function (): ?string {
+                $panel = Filament::getCurrentPanel();
 
-            $key = is_string($encryptedUser) && filled($encryptedUser)
-                ? sha1($encryptedUser)
-                : $request->ip();
+                if ($panel === null || ! $panel->hasPlugin('filament-passkeys')) {
+                    return null;
+                }
 
-            return Limit::perMinute(5)->by('filament-passkeys.verify:' . $key);
-        });
+                /** @var FilamentPasskeysPlugin $plugin */
+                $plugin = $panel->getPlugin('filament-passkeys');
 
-        RateLimiter::for('filament-passkeys.register', function (Request $request): Limit {
-            $id = $request->user()?->getAuthIdentifier();
-            $key = is_string($id) || is_int($id) ? $id : $request->ip();
+                if (! $plugin->hasPasswordlessLogin()) {
+                    return null;
+                }
 
-            return Limit::perMinute(5)->by('filament-passkeys.register:' . $key);
-        });
+                return view('filament-passkeys::login-button')->render();
+            },
+        );
     }
 }

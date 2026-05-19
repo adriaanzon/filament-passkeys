@@ -44,3 +44,25 @@ it('throws LogicException when user does not implement PasskeyUser', function ()
 
     PasskeyAuthentication::make()->isEnabled($user);
 })->throws(LogicException::class);
+
+it('reports disabled when management only, even with passkeys', function () {
+    $user = User::create([
+        'name' => 'Test',
+        'email' => 'mo@example.com',
+        'password' => 'password',
+    ]);
+
+    $user->passkeys()->create([
+        'name' => 'Test Key',
+        'credential_id' => 'test-credential-id',
+        'credential' => ['id' => 'test'],
+    ]);
+
+    expect(PasskeyAuthentication::make()->managementOnly()->isEnabled($user))->toBeFalse();
+});
+
+it('still throws LogicException for non-PasskeyUser even when management only', function () {
+    $user = new Illuminate\Foundation\Auth\User;
+
+    PasskeyAuthentication::make()->managementOnly()->isEnabled($user);
+})->throws(LogicException::class);
