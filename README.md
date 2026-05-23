@@ -64,7 +64,7 @@ A "Sign in with passkey" button + browser autofill on the login page, with passk
 
 Users can register and manage passkeys from their profile page. The `->managementOnly()` setting keeps that UI intact while skipping the MFA challenge step.
 
-```
+```php
 ->plugins([
     FilamentPasskeysPlugin::make()->passwordlessLogin(),
 ])
