@@ -9,7 +9,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    continue-on-error: ${{ matrix.php == '8.6' }}
     strategy:
       fail-fast: true
       matrix:
@@ -29,12 +28,6 @@ jobs:
             testbench: 9.*
             carbon: 3.*
             collision: 8.*
-          - php: 8.6
-            laravel: 13.*
-            testbench: 11.*
-            carbon: 3.*
-            collision: 8.*
-            stability: prefer-stable
         exclude:
           - laravel: 13.*
             php: 8.2
