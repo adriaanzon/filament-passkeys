@@ -32,7 +32,7 @@ class PasskeyConfirmationController extends Controller
         $request->session()->put('passkey.mfa_user', $request->query('user'));
 
         return response()->json([
-            'options' => json_decode($serialized, true),
+            'options' => WebAuthn::toBrowserArray($options),
         ]);
     }
 
