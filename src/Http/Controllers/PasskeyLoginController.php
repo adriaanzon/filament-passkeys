@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Laravel\Passkeys\Actions\GenerateVerificationOptions;
 use Laravel\Passkeys\Actions\VerifyPasskey;
+use Laravel\Passkeys\Exceptions\InvalidPasskeyException;
 use Laravel\Passkeys\Http\Requests\PasskeyVerificationRequest;
 use Laravel\Passkeys\Passkeys;
 use Laravel\Passkeys\Support\WebAuthn;
@@ -40,7 +41,7 @@ class PasskeyLoginController extends Controller
         );
 
         if (! Passkeys::allowsLogin($request, $passkey)) {
-            abort(403);
+            throw InvalidPasskeyException::make('filament-passkeys::passkeys.login.failed');
         }
 
         $user = $passkey->user;
@@ -48,7 +49,7 @@ class PasskeyLoginController extends Controller
         $panel = Filament::getCurrentOrDefaultPanel();
 
         if ($user instanceof FilamentUser && ($panel === null || ! $user->canAccessPanel($panel))) {
-            abort(403);
+            throw InvalidPasskeyException::make('filament-passkeys::passkeys.login.failed');
         }
 
         Filament::auth()->login($user);

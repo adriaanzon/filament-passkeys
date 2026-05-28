@@ -130,7 +130,9 @@ it('rejects login when the authorize callback denies it', function () {
         ],
     ];
 
-    $this->postJson('/admin/passkeys/login', $payload)->assertForbidden();
+    $this->postJson('/admin/passkeys/login', $payload)
+        ->assertStatus(422)
+        ->assertJsonValidationErrors(['credential']);
 
     $this->assertGuest();
 });
