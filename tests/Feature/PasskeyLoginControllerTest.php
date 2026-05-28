@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 use AdriaanZon\FilamentPasskeys\Tests\Fixtures\User;
 use Laravel\Passkeys\Actions\VerifyPasskey;
+use Laravel\Passkeys\Passkeys;
+
+afterEach(function () {
+    Passkeys::authorizeLoginUsing(null);
+});
 
 it('returns passwordless verification options without allowCredentials', function () {
     $response = $this->getJson('/admin/passkeys/login/options');
@@ -89,6 +94,45 @@ it('logs the user in on a successful assertion', function () {
     $response->assertJsonStructure(['redirect']);
 
     $this->assertAuthenticatedAs($user);
+});
+
+it('rejects login when the authorize callback denies it', function () {
+    $user = User::create([
+        'name' => 'Test',
+        'email' => 'denied@example.com',
+        'password' => 'password',
+    ]);
+
+    $passkey = $user->passkeys()->create([
+        'name' => 'Test Key',
+        'credential_id' => 'dGVzdGNyZWRlbnRpYWxpZA',
+        'credential' => ['id' => 'dGVzdGNyZWRlbnRpYWxpZA'],
+    ]);
+
+    Passkeys::authorizeLoginUsing(fn (): bool => false);
+
+    $this->getJson('/admin/passkeys/login/options')->assertOk();
+
+    $this->mock(VerifyPasskey::class, function ($mock) use ($passkey) {
+        $mock->shouldReceive('__invoke')->once()->andReturn($passkey);
+    });
+
+    $payload = [
+        'credential' => [
+            'id' => 'dGVzdGNyZWRlbnRpYWxpZA',
+            'rawId' => 'dGVzdGNyZWRlbnRpYWxpZA==',
+            'type' => 'public-key',
+            'response' => [
+                'clientDataJSON' => 'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiZEdWemRBIiwib3JpZ2luIjoiaHR0cDpcL1wvbG9jYWxob3N0In0',
+                'authenticatorData' => 'SZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2MBAAAAAA==',
+                'signature' => 'ZmFrZS1zaWc=',
+            ],
+        ],
+    ];
+
+    $this->postJson('/admin/passkeys/login', $payload)->assertForbidden();
+
+    $this->assertGuest();
 });
 
 it('renders the sign in with passkey button on the login page', function () {

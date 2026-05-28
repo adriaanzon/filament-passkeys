@@ -12,6 +12,7 @@ use Illuminate\Routing\Controller;
 use Laravel\Passkeys\Actions\GenerateVerificationOptions;
 use Laravel\Passkeys\Actions\VerifyPasskey;
 use Laravel\Passkeys\Http\Requests\PasskeyVerificationRequest;
+use Laravel\Passkeys\Passkeys;
 use Laravel\Passkeys\Support\WebAuthn;
 
 class PasskeyLoginController extends Controller
@@ -37,6 +38,10 @@ class PasskeyLoginController extends Controller
             $request->credential(),
             $request->verificationOptions(),
         );
+
+        if (! Passkeys::allowsLogin($request, $passkey)) {
+            abort(403);
+        }
 
         $user = $passkey->user;
 
