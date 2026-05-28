@@ -62,7 +62,7 @@ class PasskeyAuthentication implements MultiFactorAuthenticationProvider
             return false;
         }
 
-        return $user->passkeys()->exists();
+        return $user->hasPasskeysEnabled();
     }
 
     public function getManagementSchemaComponents(): array
