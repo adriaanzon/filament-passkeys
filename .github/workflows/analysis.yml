@@ -2,6 +2,9 @@ name: Analysis
 
 on: [push]
 
+permissions:
+  contents: read
+
 jobs:
   phpstan:
     runs-on: ubuntu-latest
