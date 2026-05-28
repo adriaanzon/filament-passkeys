@@ -62,19 +62,11 @@ class PasskeyAuthentication implements MultiFactorAuthenticationProvider
             return false;
         }
 
-        return $user->passkeys()->exists();
+        return $user->hasPasskeysEnabled();
     }
 
     public function getManagementSchemaComponents(): array
     {
-        $getPasskeys = function () {
-            $user = Filament::auth()->user();
-
-            return $user instanceof PasskeyUser
-                ? $user->passkeys()->orderBy('created_at', 'desc')->get()
-                : collect();
-        };
-
         return [
             RepeatableEntry::make('passkeys')
                 ->extraAttributes(['class' => 'fi-passkeys-table'])
@@ -82,14 +74,14 @@ class PasskeyAuthentication implements MultiFactorAuthenticationProvider
                 ->when(
                     ! $this->managementOnly,
                     fn (RepeatableEntry $entry): RepeatableEntry => $entry->afterLabel(
-                        fn (): Text => $getPasskeys()->isNotEmpty()
+                        fn (): Text => $this->isEnabled($this->getPasskeyUser())
                             ? Text::make(__('filament-passkeys::passkeys.management.enabled'))->badge()->color('success')
                             : Text::make(__('filament-passkeys::passkeys.management.disabled'))->badge()->color('gray')
                     )
                 )
                 ->aboveContent(__('filament-passkeys::passkeys.management.description'))
                 ->belowContent(View::make('filament-passkeys::add-passkey-button'))
-                ->constantState($getPasskeys)
+                ->constantState(fn () => $this->getPasskeyUser()->passkeys()->orderBy('created_at', 'desc')->get())
                 ->placeholder(__('filament-passkeys::passkeys.management.empty'))
                 ->table([
                     TableColumn::make(__('filament-passkeys::passkeys.management.columns.name')),
@@ -127,5 +119,16 @@ class PasskeyAuthentication implements MultiFactorAuthenticationProvider
                     }
                 }),
         ];
+    }
+
+    protected function getPasskeyUser(): PasskeyUser
+    {
+        $user = Filament::auth()->user();
+
+        if (! $user instanceof PasskeyUser) {
+            throw new LogicException('The user model must implement the [' . PasskeyUser::class . '] interface to use passkey authentication.');
+        }
+
+        return $user;
     }
 }
