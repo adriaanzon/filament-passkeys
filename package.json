@@ -8,7 +8,7 @@
     },
     "devDependencies": {
         "esbuild": "^0.28.0",
-        "lefthook": "^2.1.5"
+        "lefthook": "^2.1.9"
     },
     "dependencies": {
         "@laravel/passkeys": "^0.2.0"
