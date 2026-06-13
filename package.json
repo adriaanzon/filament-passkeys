@@ -7,7 +7,7 @@
         "postinstall": "lefthook install"
     },
     "devDependencies": {
-        "esbuild": "^0.28.0",
+        "esbuild": "^0.28.1",
         "lefthook": "^2.1.9"
     },
     "dependencies": {
