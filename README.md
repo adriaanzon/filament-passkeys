@@ -114,7 +114,12 @@ To use passkeys as both a login option and an MFA factor for password sign-ins, 
 
 ## WebAuthn configuration
 
-WebAuthn settings (relying party ID, allowed origins, user handle secret, timeout, throttling) live in [`laravel/passkeys`][laravel-passkeys]'s config. Publish it with:
+WebAuthn settings (relying party ID, allowed origins, user handle secret, timeout, throttling) live in [`laravel/passkeys`][laravel-passkeys]'s `config/passkeys.php`.
+
+> [!IMPORTANT]
+> If you use [Laravel Fortify](https://laravel.com/docs/13.x/fortify#enabling-passkeys), configure these settings in the `passkeys` array in `config/fortify.php` instead and skip the rest of this section. Fortify wraps `laravel/passkeys` and ignores any values in `config/passkeys.php`.
+
+Publish the config with:
 
 ```bash
 php artisan vendor:publish --tag="passkeys-config"
