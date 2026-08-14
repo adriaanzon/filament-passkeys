@@ -35,7 +35,7 @@ return [
         'failed' => 'Không thể xác minh passkey đó. Vui lòng thử lại.',
         'callout' => [
             'heading' => 'Đăng nhập bằng passkey',
-            'description' => 'Tiếp tục chọn một passkey từ thiết bị hoặc trình quản lý mật khẩu của bạn.',
+            'description' => 'Nhấn ":action" để chọn passkey từ thiết bị hoặc trình quản lý mật khẩu của bạn.',
             'waiting' => 'Đang chờ passkey của bạn…',
         ],
     ],

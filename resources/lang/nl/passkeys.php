@@ -35,7 +35,7 @@ return [
         'failed' => 'De passkey kon niet geverifieerd worden. Probeer het opnieuw.',
         'callout' => [
             'heading' => 'Aanmelden met een passkey',
-            'description' => 'Ga verder om een passkey te kiezen op je apparaat of in je wachtwoordmanager.',
+            'description' => 'Druk op ":action" om een passkey te kiezen op je apparaat of wachtwoordmanager.',
             'waiting' => 'Wachten op je passkey…',
         ],
     ],

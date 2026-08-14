@@ -35,7 +35,7 @@ return [
         'failed' => 'That passkey couldn\'t be verified. Please try again.',
         'callout' => [
             'heading' => 'Sign in with a passkey',
-            'description' => 'Continue to choose a passkey from your device or password manager.',
+            'description' => 'Press ":action" to choose a passkey from your device or password manager.',
             'waiting' => 'Waiting for your passkey…',
         ],
     ],

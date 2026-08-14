@@ -106,7 +106,7 @@
                     :heading="__('filament-passkeys::passkeys.challenge.callout.heading')"
                 >
                     <x-slot:description>
-                        <span x-show="!loading">{{ __('filament-passkeys::passkeys.challenge.callout.description') }}</span>
+                        <span x-show="!loading">{{ __('filament-passkeys::passkeys.challenge.callout.description', ['action' => __('filament-panels::auth/pages/login.multi_factor.form.actions.authenticate.label')]) }}</span>
                         <span x-show="loading" x-cloak>{{ __('filament-passkeys::passkeys.challenge.callout.waiting') }}</span>
                     </x-slot:description>
                 </x-filament::callout>
