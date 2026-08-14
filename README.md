@@ -60,7 +60,7 @@ This plugin supports the following setups:
 
 ### Passwordless sign-in only
 
-A "Sign in with passkey" button + browser autofill on the login page, with passkeys excluded from Filament's MFA challenge.
+A "Sign in with passkey" button + browser autofill on the login page, with passkeys excluded from Filament's MFA challenge. The login form's "Remember me" checkbox is honored when signing in with a passkey.
 
 Users can register and manage passkeys from their profile page. The `->managementOnly()` setting keeps that UI intact while skipping the MFA challenge step.
 
