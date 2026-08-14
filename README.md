@@ -86,9 +86,22 @@ If you'd rather use passkeys as a second factor on top of password login (and no
 ])
 ```
 
+#### Requiring MFA
+
+Filament's [`isRequired` argument](https://filamentphp.com/docs/5.x/users/multi-factor-authentication#requiring-multi-factor-authentication) works with passkeys too. Users without a passkey are prompted to set one up before they can use the panel:
+
+```php
+->multiFactorAuthentication([
+    PasskeyAuthentication::make(),
+], isRequired: true)
+```
+
+> [!WARNING]
+> This doesn't work with `->managementOnly()`: it excludes passkeys from MFA entirely, so users would get stuck on the set-up page even after registering one.
+
 #### Fallback MFA method
 
-Without a usable passkey, users cannot get past the MFA challenge and would be locked out. Pair `PasskeyAuthentication` with one of Filament's built-in providers like [`EmailAuthentication`](https://filamentphp.com/docs/5.x/users/multi-factor-authentication#email-authentication) so they can still sign in:
+When a user is unable to access their passkey, they cannot get past the MFA challenge and would be locked out. Pair `PasskeyAuthentication` with one of Filament's built-in providers like [`EmailAuthentication`](https://filamentphp.com/docs/5.x/users/multi-factor-authentication#email-authentication) so they can still sign in:
 
 ```php
 use Filament\Auth\MultiFactor\Email\EmailAuthentication;
