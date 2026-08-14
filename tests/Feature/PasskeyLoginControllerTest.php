@@ -3,12 +3,56 @@
 declare(strict_types=1);
 
 use AdriaanZon\FilamentPasskeys\Tests\Fixtures\User;
+use Illuminate\Database\Eloquent\Model;
 use Laravel\Passkeys\Actions\VerifyPasskey;
 use Laravel\Passkeys\Passkeys;
 
 afterEach(function () {
     Passkeys::authorizeLoginUsing(null);
 });
+
+/**
+ * @return array{User, Model}
+ */
+function createUserWithPasskey(string $email): array
+{
+    $user = User::create([
+        'name' => 'Test',
+        'email' => $email,
+        'password' => 'password',
+    ]);
+
+    $passkey = $user->passkeys()->create([
+        'name' => 'Test Key',
+        'credential_id' => 'dGVzdGNyZWRlbnRpYWxpZA',
+        'credential' => ['id' => 'dGVzdGNyZWRlbnRpYWxpZA'],
+    ]);
+
+    return [$user, $passkey];
+}
+
+/**
+ * Minimal valid WebAuthn assertion credential:
+ * - id/rawId: base64url/base64 of the same raw bytes
+ * - clientDataJSON: base64url of JSON with type, challenge, origin
+ * - authenticatorData: base64 of rpIdHash(32) + flags(1) + counter(4)
+ * - signature: any base64-encoded bytes
+ *
+ * @return array<string, mixed>
+ */
+function fakeAssertionCredential(): array
+{
+    return [
+        'id' => 'dGVzdGNyZWRlbnRpYWxpZA',
+        'rawId' => 'dGVzdGNyZWRlbnRpYWxpZA==',
+        'type' => 'public-key',
+        'response' => [
+            'clientDataJSON' => 'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiZEdWemRBIiwib3JpZ2luIjoiaHR0cDpcL1wvbG9jYWxob3N0In0',
+            'authenticatorData' => 'SZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2MBAAAAAA==',
+            'signature' => 'ZmFrZS1zaWc=',
+        ],
+    ];
+}
 
 it('returns passwordless verification options without allowCredentials', function () {
     $response = $this->getJson('/admin/passkeys/login/options');
@@ -52,17 +96,7 @@ it('rejects login with malformed credential', function () {
 });
 
 it('logs the user in on a successful assertion', function () {
-    $user = User::create([
-        'name' => 'Test',
-        'email' => 'pw@example.com',
-        'password' => 'password',
-    ]);
-
-    $passkey = $user->passkeys()->create([
-        'name' => 'Test Key',
-        'credential_id' => 'dGVzdGNyZWRlbnRpYWxpZA',
-        'credential' => ['id' => 'dGVzdGNyZWRlbnRpYWxpZA'],
-    ]);
+    [$user, $passkey] = createUserWithPasskey('pw@example.com');
 
     $this->getJson('/admin/passkeys/login/options')->assertOk();
 
@@ -70,25 +104,9 @@ it('logs the user in on a successful assertion', function () {
         $mock->shouldReceive('__invoke')->once()->andReturn($passkey);
     });
 
-    // Minimal valid WebAuthn assertion credential:
-    // - id/rawId: base64url/base64 of the same raw bytes
-    // - clientDataJSON: base64url of JSON with type, challenge, origin
-    // - authenticatorData: base64 of rpIdHash(32) + flags(1) + counter(4)
-    // - signature: any base64-encoded bytes
-    $payload = [
-        'credential' => [
-            'id' => 'dGVzdGNyZWRlbnRpYWxpZA',
-            'rawId' => 'dGVzdGNyZWRlbnRpYWxpZA==',
-            'type' => 'public-key',
-            'response' => [
-                'clientDataJSON' => 'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiZEdWemRBIiwib3JpZ2luIjoiaHR0cDpcL1wvbG9jYWxob3N0In0',
-                'authenticatorData' => 'SZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2MBAAAAAA==',
-                'signature' => 'ZmFrZS1zaWc=',
-            ],
-        ],
-    ];
-
-    $response = $this->postJson('/admin/passkeys/login', $payload);
+    $response = $this->postJson('/admin/passkeys/login', [
+        'credential' => fakeAssertionCredential(),
+    ]);
 
     $response->assertOk();
     $response->assertJsonStructure(['redirect']);
@@ -96,18 +114,34 @@ it('logs the user in on a successful assertion', function () {
     $this->assertAuthenticatedAs($user);
 });
 
-it('rejects login when the authorize callback denies it', function () {
-    $user = User::create([
-        'name' => 'Test',
-        'email' => 'denied@example.com',
-        'password' => 'password',
+it('remembers the user when requested', function (bool $remember) {
+    [$user, $passkey] = createUserWithPasskey('remember@example.com');
+
+    $this->getJson('/admin/passkeys/login/options')->assertOk();
+
+    $this->mock(VerifyPasskey::class, function ($mock) use ($passkey) {
+        $mock->shouldReceive('__invoke')->once()->andReturn($passkey);
+    });
+
+    $response = $this->postJson('/admin/passkeys/login', [
+        'credential' => fakeAssertionCredential(),
+        'remember' => $remember,
     ]);
 
-    $passkey = $user->passkeys()->create([
-        'name' => 'Test Key',
-        'credential_id' => 'dGVzdGNyZWRlbnRpYWxpZA',
-        'credential' => ['id' => 'dGVzdGNyZWRlbnRpYWxpZA'],
-    ]);
+    $response->assertOk();
+    $this->assertAuthenticatedAs($user);
+
+    $recaller = auth()->guard('web')->getRecallerName();
+
+    if ($remember) {
+        $response->assertCookie($recaller);
+    } else {
+        $response->assertCookieMissing($recaller);
+    }
+})->with(['remembered' => true, 'not remembered' => false]);
+
+it('rejects login when the authorize callback denies it', function () {
+    [$user, $passkey] = createUserWithPasskey('denied@example.com');
 
     Passkeys::authorizeLoginUsing(fn (): bool => false);
 
@@ -117,20 +151,7 @@ it('rejects login when the authorize callback denies it', function () {
         $mock->shouldReceive('__invoke')->once()->andReturn($passkey);
     });
 
-    $payload = [
-        'credential' => [
-            'id' => 'dGVzdGNyZWRlbnRpYWxpZA',
-            'rawId' => 'dGVzdGNyZWRlbnRpYWxpZA==',
-            'type' => 'public-key',
-            'response' => [
-                'clientDataJSON' => 'eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiZEdWemRBIiwib3JpZ2luIjoiaHR0cDpcL1wvbG9jYWxob3N0In0',
-                'authenticatorData' => 'SZYN5YgOjGh0NBcPZHZgW4/krrmihjLHmVzzuoMdl2MBAAAAAA==',
-                'signature' => 'ZmFrZS1zaWc=',
-            ],
-        ],
-    ];
-
-    $this->postJson('/admin/passkeys/login', $payload)
+    $this->postJson('/admin/passkeys/login', ['credential' => fakeAssertionCredential()])
         ->assertStatus(422)
         ->assertJsonValidationErrors(['credential']);
 

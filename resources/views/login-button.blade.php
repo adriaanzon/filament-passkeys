@@ -38,9 +38,16 @@
             }
         },
 
+        remember() {
+            return document.querySelector('input[type=checkbox][id$=remember]')?.checked ?? false
+        },
+
         async startAutofill() {
             try {
-                const result = await window.FilamentPasskeys.autofill({ routes: this.routes() })
+                const result = await window.FilamentPasskeys.autofill({
+                    routes: this.routes(),
+                    remember: () => this.remember(),
+                })
 
                 if (result?.redirect) {
                     window.location.href = result.redirect
@@ -56,7 +63,10 @@
             this.loading = true
 
             try {
-                const result = await window.FilamentPasskeys.verify({ routes: this.routes() })
+                const result = await window.FilamentPasskeys.verify({
+                    routes: this.routes(),
+                    remember: () => this.remember(),
+                })
 
                 if (result?.redirect) {
                     window.location.href = result.redirect

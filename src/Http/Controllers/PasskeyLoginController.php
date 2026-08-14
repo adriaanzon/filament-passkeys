@@ -52,7 +52,7 @@ class PasskeyLoginController extends Controller
             throw InvalidPasskeyException::make('filament-passkeys::passkeys.login.failed');
         }
 
-        Filament::auth()->login($user);
+        Filament::auth()->login($user, $request->remember());
 
         $request->session()->regenerate();
 
