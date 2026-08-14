@@ -6,6 +6,7 @@
 
 <div
     class="fi-passkeys-login-button"
+    x-show="! $wire.userUndertakingMultiFactorAuthentication"
     x-data="{
         supported: true,
         loading: false,
