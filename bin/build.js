@@ -45,6 +45,7 @@ const defaultOptions = {
 
 compile({
     ...defaultOptions,
+    platform: 'browser',
     entryPoints: ['./resources/js/index.js'],
     outfile: './resources/dist/filament-passkeys.js',
 }).then(() => {
