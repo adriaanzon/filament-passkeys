@@ -7,6 +7,7 @@ use Filament\Auth\Pages\Login;
 use Filament\Facades\Filament;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Laravel\Passkeys\Actions\VerifyPasskey;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 
@@ -44,6 +45,30 @@ it('accepts the login page MFA state on the confirmation endpoint', function () 
     $this->getJson('/admin/passkeys/confirm/options?user=' . urlencode($state))
         ->assertOk()
         ->assertJsonStructure(['options']);
+});
+
+it('signs the user in after the passkey is verified through the confirmation endpoint', function () {
+    $component = loginUpToPasskeyChallenge();
+    $state = $component->get('userUndertakingMultiFactorAuthentication');
+
+    $this->getJson('/admin/passkeys/confirm/options?user=' . urlencode($state))
+        ->assertOk();
+
+    $this->mock(VerifyPasskey::class, function ($mock) {
+        $mock->shouldReceive('__invoke')->once()->andReturn($this->user->passkeys()->first());
+    });
+
+    $this->postJson('/admin/passkeys/confirm', ['credential' => fakeAssertionCredential()])
+        ->assertOk();
+
+    expect(Filament::auth()->check())->toBeFalse();
+
+    $component
+        ->set('data.multiFactor.passkey.credential', 'verified')
+        ->call('authenticate')
+        ->assertHasNoFormErrors();
+
+    expect(Filament::auth()->id())->toBe($this->user->getKey());
 });
 
 it('signs the user in once the passkey has been verified', function () {
