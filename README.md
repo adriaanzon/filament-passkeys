@@ -4,6 +4,8 @@ A Filament v5 panel plugin for passkey/WebAuthn authentication. Use passkeys as 
 
 ## Installation
 
+Requires Filament 5.10 or later.
+
 1. Install the package via Composer:
    ```bash
    composer require adriaanzon/filament-passkeys
