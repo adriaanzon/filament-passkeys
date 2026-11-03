@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AdriaanZon\FilamentPasskeys\Http\Controllers;
 
+use Filament\Facades\Filament;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\JsonResponse;
@@ -73,6 +74,10 @@ class PasskeyConfirmationController extends Controller
         return $this->findUserByEncryptedId($request->session()->get('passkey.mfa_user'));
     }
 
+    /**
+     * Resolves the user from the login page's encrypted MFA state, which holds
+     * the auth identifier and a key scoped to the panel's guard and user model.
+     */
     protected function findUserByEncryptedId(mixed $encrypted): ?Authenticatable
     {
         if (! is_string($encrypted) || blank($encrypted)) {
@@ -80,10 +85,16 @@ class PasskeyConfirmationController extends Controller
         }
 
         try {
-            $userId = decrypt($encrypted);
+            $data = decrypt($encrypted);
         } catch (DecryptException) {
             return null;
         }
+
+        if (! is_array($data) || ! is_string($data['userKey'] ?? null)) {
+            return null;
+        }
+
+        $userId = $data['identifier'] ?? null;
 
         if (! is_string($userId) && ! is_int($userId)) {
             return null;
@@ -92,6 +103,12 @@ class PasskeyConfirmationController extends Controller
         /** @var class-string<Authenticatable> $userModel */
         $userModel = Passkeys::userModel();
 
-        return $userModel::find($userId);
+        $user = $userModel::find($userId);
+
+        if (! $user || ! hash_equals($data['userKey'], Filament::getUserScopedAuthIdentifier($user))) {
+            return null;
+        }
+
+        return $user;
     }
 }

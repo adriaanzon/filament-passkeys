@@ -23,17 +23,17 @@ jobs:
             testbench: 11.*
             carbon: 3.*
             collision: 8.*
-            filament: ^5.4.4
+            filament: ^5.10
           - laravel: 12.*
             testbench: 10.*
             carbon: 3.*
             collision: 8.*
-            filament: ^5.3.5
+            filament: ^5.10
           - laravel: 11.*
             testbench: 9.*
             carbon: 3.*
             collision: 8.*
-            filament: ^5.3.5
+            filament: ^5.10
         exclude:
           - laravel: 13.*
             php: 8.2
