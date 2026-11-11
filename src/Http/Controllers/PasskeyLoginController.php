@@ -41,7 +41,7 @@ class PasskeyLoginController extends Controller
         );
 
         if (! Passkeys::allowsLogin($request, $passkey)) {
-            throw InvalidPasskeyException::make('filament-passkeys::passkeys.login.failed');
+            throw InvalidPasskeyException::make(__('filament-passkeys::passkeys.login.failed'));
         }
 
         $user = $passkey->user;
@@ -49,7 +49,7 @@ class PasskeyLoginController extends Controller
         $panel = Filament::getCurrentOrDefaultPanel();
 
         if ($user instanceof FilamentUser && ($panel === null || ! $user->canAccessPanel($panel))) {
-            throw InvalidPasskeyException::make('filament-passkeys::passkeys.login.failed');
+            throw InvalidPasskeyException::make(__('filament-passkeys::passkeys.login.failed'));
         }
 
         Filament::auth()->login($user, $request->remember());

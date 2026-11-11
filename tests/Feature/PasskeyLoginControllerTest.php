@@ -130,7 +130,7 @@ it('rejects login when the authorize callback denies it', function () {
 
     $this->postJson('/admin/passkeys/login', ['credential' => fakeAssertionCredential()])
         ->assertStatus(422)
-        ->assertJsonValidationErrors(['credential']);
+        ->assertJsonValidationErrors(['credential' => __('filament-passkeys::passkeys.login.failed')]);
 
     $this->assertGuest();
 });
